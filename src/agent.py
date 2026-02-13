@@ -18,7 +18,7 @@ class SchemeAgent:
         if self.use_groq:
             self.groq_api_key = os.getenv("GROQ_API_KEY", "")
             self.groq_url = "https://api.groq.com/openai/v1/chat/completions"
-            self.model = "llama-3.1-70b-versatile"
+            self.model = "llama-3.1-8b-instant"
         else:
             self.ollama_url = "http://localhost:11434/api/generate"
             self.model = "llama3.2"
