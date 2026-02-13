@@ -8,6 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from agent import SchemeAgent
 import uvicorn
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
 
 # Create FastAPI app
 app = FastAPI(
@@ -28,6 +31,15 @@ app.add_middleware(
 # Initialize agent
 agent = SchemeAgent()
 
+# Serve frontend (ADD THIS NEW CODE)
+if os.path.exists("frontend"):
+    app.mount("/static", StaticFiles(directory="frontend"), name="static")
+    
+    @app.get("/", include_in_schema=False)
+    def serve_frontend():
+        """Serve the frontend HTML"""
+        return FileResponse("frontend/index.html")
+    
 # Define request/response models
 class ChatRequest(BaseModel):
     message: str

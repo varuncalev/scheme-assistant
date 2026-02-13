@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+*.db
+.env
+.DS_Store
+*.log
+chroma_db/
+node_modules/
