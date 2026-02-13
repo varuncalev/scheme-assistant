@@ -1,0 +1,321 @@
+"""
+Web scraper to automatically fetch government schemes from official websites.
+This makes our database more comprehensive and up-to-date.
+"""
+
+import requests
+from bs4 import BeautifulSoup
+import json
+import time
+
+class SchemeScraper:
+    def __init__(self):
+        self.schemes = []
+        self.headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+    
+    def scrape_myscheme_gov(self):
+        """
+        Scrape schemes from MyScheme.gov.in
+        Note: This is a simplified example. Real scraping may need more complex logic.
+        """
+        print("🔍 Scraping MyScheme.gov.in...")
+        
+        try:
+            # This is a placeholder - MyScheme.gov.in structure changes
+            # We'll create manual high-quality data instead
+            pass
+        except Exception as e:
+            print(f"Error scraping: {e}")
+    
+    def add_manual_schemes(self):
+        """
+        Add comprehensive, high-quality scheme data manually
+        This is more reliable than scraping for now
+        """
+        
+        schemes_data = [
+            # Agriculture & Farming
+            {
+                "id": "1",
+                "name": "PM-KISAN",
+                "full_name": "Pradhan Mantri Kisan Samman Nidhi",
+                "category": "Agriculture",
+                "ministry": "Ministry of Agriculture & Farmers Welfare",
+                "description": "Direct income support of ₹6,000 per year to all landholding farmers' families in three equal installments of ₹2,000 each.",
+                "eligibility": "All landholding farmers' families. Exclusions: Institutional landholders, farmers who are/were constitutional post holders, serving/retired officers and employees of central/state government, all superannuated/retired pensioners with monthly pension of ₹10,000 or more, income tax payers in last assessment year.",
+                "benefits": "₹6,000 per year in 3 installments of ₹2,000 directly to bank account",
+                "documents_required": "Aadhaar card, Bank account passbook, Land ownership documents (Khatauni), Self-declaration form",
+                "how_to_apply": "1. Visit pmkisan.gov.in\n2. Click 'Farmers Corner' → 'New Farmer Registration'\n3. Enter Aadhaar number, mobile, state\n4. Fill registration form with land details\n5. Submit documents at Common Service Centre (CSC)",
+                "website": "https://pmkisan.gov.in",
+                "launched_year": "2019",
+                "beneficiaries": "11+ crore farmers"
+            },
+            {
+                "id": "2",
+                "name": "Kisan Credit Card",
+                "full_name": "Kisan Credit Card (KCC)",
+                "category": "Agriculture",
+                "ministry": "Ministry of Agriculture & Farmers Welfare",
+                "description": "Short-term credit to farmers for cultivation expenses, purchase of inputs, and other farm-related costs. Interest subvention of 2% provided.",
+                "eligibility": "All farmers including sharecroppers, tenant farmers, and oral lessees. Both individual and group/joint borrowers (SHGs, JLGs).",
+                "benefits": "Credit up to ₹3 lakh at 7% interest (4% with prompt repayment), Flexible withdrawal, Insurance coverage",
+                "documents_required": "Land ownership proof, Identity proof, Address proof, Passport size photographs",
+                "how_to_apply": "Apply at nearest bank branch (nationalized banks, RRBs, cooperative banks)",
+                "website": "https://www.india.gov.in/spotlight/kisan-credit-card-kcc",
+                "launched_year": "1998",
+                "beneficiaries": "7+ crore farmers"
+            },
+            {
+                "id": "3",
+                "name": "PM Fasal Bima Yojana",
+                "full_name": "Pradhan Mantri Fasal Bima Yojana",
+                "category": "Agriculture",
+                "ministry": "Ministry of Agriculture & Farmers Welfare",
+                "description": "Crop insurance scheme providing financial support to farmers suffering crop loss/damage due to unforeseen events. Covers pre-sowing to post-harvest losses.",
+                "eligibility": "All farmers including sharecroppers and tenant farmers growing notified crops in notified areas. Mandatory for farmers with institutional loans, voluntary for others.",
+                "benefits": "Premium: 2% for Kharif, 1.5% for Rabi, 5% for commercial/horticultural crops. Remaining premium paid by government. Full sum insured coverage.",
+                "documents_required": "Aadhaar card, Bank account, Land records, Sowing certificate (for non-loanee farmers)",
+                "how_to_apply": "Through bank for loanee farmers, Through CSC/Agriculture office/Insurance company portal for non-loanee farmers",
+                "website": "https://pmfby.gov.in",
+                "launched_year": "2016",
+                "beneficiaries": "5.5+ crore farmer applications annually"
+            },
+            
+            # Health & Wellness
+            {
+                "id": "4",
+                "name": "Ayushman Bharat",
+                "full_name": "Pradhan Mantri Jan Arogya Yojana (PM-JAY)",
+                "category": "Healthcare",
+                "ministry": "Ministry of Health and Family Welfare",
+                "description": "World's largest health insurance scheme providing free treatment for secondary and tertiary care hospitalization. Covers 1,949 medical and surgical packages including COVID-19 treatment.",
+                "eligibility": "Bottom 40% poorest and vulnerable families based on SECC 2011 database. Automatically covers all members in eligible family. No age limit, pre-existing disease covered from day 1.",
+                "benefits": "₹5 lakh per family per year coverage, Cashless and paperless treatment at empanelled hospitals, No cap on family size or age, Coverage includes pre and post-hospitalization expenses",
+                "documents_required": "Aadhaar card (for verification), Ration card, Any government ID proof. Check eligibility at https://bis.pmjay.gov.in",
+                "how_to_apply": "No application needed if eligible under SECC 2011. Visit nearest Ayushman Bharat - Health and Wellness Centre or empanelled hospital with Aadhaar card to generate e-card.",
+                "website": "https://pmjay.gov.in",
+                "launched_year": "2018",
+                "beneficiaries": "12+ crore families, 55+ crore individuals"
+            },
+            {
+                "id": "5",
+                "name": "Atal Pension Yojana",
+                "full_name": "Atal Pension Yojana (APY)",
+                "category": "Pension",
+                "ministry": "Ministry of Finance",
+                "description": "Government-backed pension scheme for unorganized sector workers. Guaranteed minimum pension of ₹1,000 to ₹5,000 per month from age 60.",
+                "eligibility": "Indian citizen aged 18-40 years, Bank account holder, Aadhaar and mobile number",
+                "benefits": "Guaranteed pension ₹1,000/2,000/3,000/4,000/5,000 per month based on contribution. Spouse pension on death of subscriber. Return of corpus to nominee if both die.",
+                "documents_required": "Aadhaar card, Bank account, Mobile number for registration",
+                "how_to_apply": "Visit bank branch with Aadhaar, Fill APY registration form, Link bank account for auto-debit, Can also apply online through net banking",
+                "website": "https://www.npscra.nsdl.co.in/atal-pension-yojana.php",
+                "launched_year": "2015",
+                "beneficiaries": "5+ crore subscribers"
+            },
+            
+            # Women & Child Development
+            {
+                "id": "6",
+                "name": "Sukanya Samriddhi Yojana",
+                "full_name": "Sukanya Samriddhi Account",
+                "category": "Women & Child",
+                "ministry": "Ministry of Finance",
+                "description": "Small deposit scheme for girl child with attractive interest rate and tax benefits under Section 80C. Matures after 21 years from account opening.",
+                "eligibility": "Girl child below 10 years of age. Parents/legal guardian can open account. Maximum 2 accounts per family (one per girl child).",
+                "benefits": "Current interest: 8.2% per annum (revised quarterly), Tax exemption on deposit (80C), interest earned, and maturity amount (EEE status), Partial withdrawal allowed after girl turns 18",
+                "documents_required": "Girl child's birth certificate, Parent/guardian's identity and address proof, Photographs, Initial deposit of ₹250 minimum",
+                "how_to_apply": "Visit Post Office or authorized bank branches (SBI, PNB, ICICI, etc.), Fill account opening form, Submit documents and initial deposit",
+                "website": "https://www.india.gov.in/sukanya-samriddhi-yojana",
+                "launched_year": "2015",
+                "beneficiaries": "3+ crore accounts opened"
+            },
+            {
+                "id": "7",
+                "name": "Beti Bachao Beti Padhao",
+                "full_name": "Beti Bachao Beti Padhao Scheme",
+                "category": "Women & Child",
+                "ministry": "Ministry of Women and Child Development",
+                "description": "National initiative to address declining Child Sex Ratio and promote girls' education and empowerment through multi-sectoral approach.",
+                "eligibility": "All girl children, Families in 640+ districts across India",
+                "benefits": "Financial support for girl child education, Awareness campaigns, Improved access to quality education, Gender-sensitive environment creation",
+                "documents_required": "Birth certificate of girl child, Parent's identity proof, Address proof",
+                "how_to_apply": "Benefits linked to Sukanya Samriddhi Yojana account. Contact District Social Welfare Office or Women and Child Development Department",
+                "website": "https://wcd.nic.in/bbbp-schemes",
+                "launched_year": "2015",
+                "beneficiaries": "Multi-district coverage, 640+ districts"
+            },
+            
+            # Education
+            {
+                "id": "8",
+                "name": "PM SHRI Schools",
+                "full_name": "PM Schools for Rising India",
+                "category": "Education",
+                "ministry": "Ministry of Education",
+                "description": "Upgradation of 14,500+ schools to become exemplar schools showcasing NEP 2020 implementation with modern infrastructure and holistic education.",
+                "eligibility": "Existing government schools (KVs, NVs, and state government schools) selected based on criteria",
+                "benefits": "Upgraded infrastructure, Smart classrooms, Focus on holistic development, NEP 2020 aligned curriculum, Quality education",
+                "documents_required": "For students: Enrollment in selected PM SHRI school, Standard admission documents",
+                "how_to_apply": "Admission through respective school's normal admission process. Check if your local government school is a PM SHRI school on website.",
+                "website": "https://www.education.gov.in/pmshri",
+                "launched_year": "2022",
+                "beneficiaries": "14,500+ schools, lakhs of students"
+            },
+            {
+                "id": "9",
+                "name": "National Scholarship Portal",
+                "full_name": "National Scholarship Portal (NSP)",
+                "category": "Education",
+                "ministry": "Ministry of Electronics & IT",
+                "description": "Single platform for various scholarship schemes for students from SC/ST/OBC/Minority communities and economically weaker sections.",
+                "eligibility": "Varies by scheme. Generally for students from SC/ST/OBC/Minority/EWS families studying in Classes 1-12, undergraduate, postgraduate programs.",
+                "benefits": "Financial assistance ranging from ₹3,000 to ₹60,000 per year depending on scheme and course level. Pre-matric and post-matric scholarships available.",
+                "documents_required": "Aadhaar card, Caste certificate (if applicable), Income certificate, Previous year marksheet, Bank account details, Bonafide certificate from institution",
+                "how_to_apply": "1. Register on scholarships.gov.in\n2. Complete profile and choose relevant scheme\n3. Upload documents\n4. Submit application before deadline\n5. Track status online",
+                "website": "https://scholarships.gov.in",
+                "launched_year": "2015",
+                "beneficiaries": "4+ crore scholarship applications annually"
+            },
+            
+            # Business & Entrepreneurship
+            {
+                "id": "10",
+                "name": "MUDRA Loan",
+                "full_name": "Pradhan Mantri MUDRA Yojana",
+                "category": "Business & Entrepreneurship",
+                "ministry": "Ministry of Finance",
+                "description": "Provides loans up to ₹10 lakh for small businesses and micro-enterprises. Three categories: Shishu, Kishore, and Tarun based on loan amount and business stage.",
+                "eligibility": "Small/micro businesses, manufacturers, traders, shopkeepers, service providers, artisans, food processors, transporters, self-employed, small-scale industries",
+                "benefits": "Shishu: Up to ₹50,000 | Kishore: ₹50,001 to ₹5 lakh | Tarun: ₹5,00,001 to ₹10 lakh. Collateral-free loans, Competitive interest rates (8-12% approx)",
+                "documents_required": "Business plan/proposal, Identity proof (Aadhaar, PAN), Address proof, Business address proof, Income proof, Bank statements (6 months), Quotation for machinery/equipment, Business registration (if applicable)",
+                "how_to_apply": "Apply through any bank or NBFC (Non-Banking Financial Company) offering MUDRA loans. Submit application with business plan and required documents.",
+                "website": "https://www.mudra.org.in",
+                "launched_year": "2015",
+                "beneficiaries": "40+ crore loans sanctioned worth ₹23+ lakh crore"
+            },
+            {
+                "id": "11",
+                "name": "Stand Up India",
+                "full_name": "Stand Up India Scheme",
+                "category": "Business & Entrepreneurship",
+                "ministry": "Ministry of Finance",
+                "description": "Facilitates bank loans for SC/ST and women entrepreneurs for setting up greenfield enterprises in manufacturing, services, or trading sectors.",
+                "eligibility": "SC/ST and/or Women entrepreneurs aged 18+ years for setting up a greenfield enterprise. At least one SC/ST and one Woman entrepreneur per bank branch.",
+                "benefits": "Loans between ₹10 lakh to ₹1 crore, Composite loan including term loan and working capital, Lower interest rates, Repayment period up to 7 years with moratorium, Free handholding support",
+                "documents_required": "Project report, Identity proof, Address proof, Caste certificate (for SC/ST), Business registration documents, Educational qualification certificates, Bank statements",
+                "how_to_apply": "Apply online at www.standupmitra.in OR Visit scheduled commercial bank branch, Fill application form, Submit project report and documents",
+                "website": "https://www.standupmitra.in",
+                "launched_year": "2016",
+                "beneficiaries": "1.5+ lakh loans sanctioned"
+            },
+            {
+                "id": "12",
+                "name": "Startup India",
+                "full_name": "Startup India Initiative",
+                "category": "Business & Entrepreneurship",
+                "ministry": "Department for Promotion of Industry and Internal Trade",
+                "description": "Multi-faceted initiative for building strong ecosystem for nurturing innovation and startups in India. Provides recognition, funding support, tax benefits, and easier compliance.",
+                "eligibility": "Private limited company, partnership firm, or LLP incorporated/registered in India. Not older than 10 years from incorporation. Annual turnover not exceeding ₹100 crore. Working towards innovation/improvement of products/services/processes OR scalable business model with high potential for employment generation or wealth creation.",
+                "benefits": "Tax exemption for 3 consecutive years (out of first 10 years), Self-certification compliance for labor and environment laws, IPR fast-tracking and 80% rebate on patent filing, Access to Fund of Funds (₹10,000 crore corpus), Easier public procurement norms, Networking opportunities and incubator support",
+                "documents_required": "Certificate of Incorporation/Registration, Brief about nature of business, Website/pitch deck/video, Recommendation letter (if applicable), Details of intellectual property rights (if any)",
+                "how_to_apply": "Register on www.startupindia.gov.in, Fill the startup recognition form, Upload required documents, Submit for recognition, After recognition, apply for specific benefits",
+                "website": "https://www.startupindia.gov.in",
+                "launched_year": "2016",
+                "beneficiaries": "1.1+ lakh recognized startups"
+            },
+            
+            # Housing
+            {
+                "id": "13",
+                "name": "PM Awas Yojana Urban",
+                "full_name": "Pradhan Mantri Awas Yojana - Urban (PMAY-U)",
+                "category": "Housing",
+                "ministry": "Ministry of Housing and Urban Affairs",
+                "description": "Housing for All mission providing pucca houses with basic amenities to eligible urban poor. Four verticals: In-situ slum redevelopment, Credit linked subsidy, Affordable housing in partnership, Beneficiary-led construction.",
+                "eligibility": "EWS/LIG/MIG families living in urban areas. Family should not own a pucca house anywhere in India. Annual income: EWS up to ₹3 lakh, LIG ₹3-6 lakh, MIG-I ₹6-12 lakh, MIG-II ₹12-18 lakh. Includes women, SC/ST, minorities, persons with disabilities, transgenders.",
+                "benefits": "Credit Linked Subsidy: Up to ₹2.67 lakh interest subsidy on home loans | Beneficiary-led construction: ₹1.5 lakh central assistance | Slum redevelopment: Free houses for eligible slum dwellers",
+                "documents_required": "Aadhaar card, Income certificate, Identity proof, Address proof, Bank account, Caste certificate (if applicable), Disability certificate (if applicable), Property documents (for some verticals), Affidavit stating no pucca house ownership",
+                "how_to_apply": "Apply online at pmaymis.gov.in, Select appropriate vertical, Fill application form with Aadhaar, Upload documents, Submit for verification",
+                "website": "https://pmaymis.gov.in",
+                "launched_year": "2015",
+                "beneficiaries": "1.2+ crore houses sanctioned"
+            },
+            {
+                "id": "14",
+                "name": "PM Awas Yojana Rural",
+                "full_name": "Pradhan Mantri Awas Yojana - Gramin (PMAY-G)",
+                "category": "Housing",
+                "ministry": "Ministry of Rural Development",
+                "description": "Provides financial assistance to rural households for construction of pucca houses with basic amenities including toilet, electricity, LPG connection.",
+                "eligibility": "Houseless and households living in 0, 1, or 2 room kutcha houses with kutcha walls/roof. Automatically selected from SECC 2011 data. No adult member should own a pucca house. Excludes families with motorized vehicles, mechanized farming equipment, government employees, income tax payers.",
+                "benefits": "₹1.2 lakh in plains, ₹1.3 lakh in hilly states/difficult areas, ₹1.5 lakh in NE and Himalayan states. Additional ₹12,000 for toilet construction under Swachh Bharat Mission. Convergence with other schemes for electricity, LPG, MGNREGA for labor.",
+                "documents_required": "Selection automatic from SECC 2011 data. Documents needed: Aadhaar card, Bank account, Job card (for MGNREGA convergence), Photos of construction progress for installment release",
+                "how_to_apply": "Beneficiaries selected automatically from SECC data. Check eligibility at pmayg.nic.in using name/registration number. Contact Gram Panchayat/Block Development Office for inclusion if eligible but not selected.",
+                "website": "https://pmayg.nic.in",
+                "launched_year": "2016",
+                "beneficiaries": "2.9+ crore houses completed"
+            },
+            
+            # Employment
+            {
+                "id": "15",
+                "name": "MGNREGA",
+                "full_name": "Mahatma Gandhi National Rural Employment Guarantee Act",
+                "category": "Employment",
+                "ministry": "Ministry of Rural Development",
+                "description": "Largest work guarantee programme providing 100 days of guaranteed wage employment to rural households willing to do unskilled manual work.",
+                "eligibility": "Any adult member of rural household willing to do unskilled manual work. Priority to women, SC/ST, and persons with disabilities.",
+                "benefits": "Guaranteed 100 days of employment per household per financial year, Current wage: ₹225-309 per day (varies by state), Payment within 15 days, Unemployment allowance if work not provided within 15 days, Assets created benefit the community",
+                "documents_required": "Application to Gram Panchayat, Passport size photo, Aadhaar card (for linking with job card), Bank account details",
+                "how_to_apply": "Apply to Gram Panchayat for job card registration, Submit application with photo and documents, Job card issued within 15 days, Demand work at least 15 days in advance, Work allocated within 15 days of demand",
+                "website": "https://nrega.nic.in",
+                "launched_year": "2006",
+                "beneficiaries": "7+ crore households annually, 15+ crore job cards issued"
+            }
+        ]
+        
+        self.schemes = schemes_data
+        return schemes_data
+    
+    def save_to_json(self, filename="data/schemes_data.json"):
+        """Save schemes to JSON file"""
+        
+        print(f"\n💾 Saving {len(self.schemes)} schemes to {filename}...")
+        
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(self.schemes, f, ensure_ascii=False, indent=2)
+        
+        print(f"✅ Successfully saved {len(self.schemes)} schemes!")
+        
+    def get_scheme_stats(self):
+        """Print statistics about collected schemes"""
+        
+        categories = {}
+        for scheme in self.schemes:
+            cat = scheme.get('category', 'Other')
+            categories[cat] = categories.get(cat, 0) + 1
+        
+        print("\n📊 Scheme Statistics:")
+        print(f"Total Schemes: {len(self.schemes)}")
+        print("\nBy Category:")
+        for cat, count in sorted(categories.items()):
+            print(f"  • {cat}: {count}")
+
+# Run the scraper
+if __name__ == "__main__":
+    print("🚀 Starting Scheme Data Collection...\n")
+    
+    scraper = SchemeScraper()
+    
+    # Add schemes
+    scraper.add_manual_schemes()
+    
+    # Show stats
+    scraper.get_scheme_stats()
+    
+    # Save to JSON
+    scraper.save_to_json()
+    
+    print("\n✅ Done! Run 'python src/database.py' to reload database with new schemes.")
