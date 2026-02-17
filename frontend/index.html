@@ -5,249 +5,255 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
     <title>SchemeSahayak — Professional AI Assistant</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <style>
         :root {
-            --bg-main: #ffffff;
-            --bg-side: #f8fafc;
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --slate-900: #0f172a;
-            --slate-700: #334155;
-            --slate-500: #64748b;
+            --bg-side: #0f172a; /* Dark Navy Sidebar */
+            --bg-main: #f8fafc;
+            --white: #ffffff;
+            --primary: #4f46e5; /* Indigo */
             --slate-200: #e2e8f0;
-            --slate-100: #f1f5f9;
-            --green: #10b981;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-            --radius: 12px;
+            --slate-500: #64748b;
+            --slate-900: #0f172a;
+            --radius: 16px;
             --font: 'Inter', system-ui, sans-serif;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: var(--font); background: var(--bg-main); color: var(--slate-900); overflow: hidden; height: 100vh; }
 
-        /* ── LAYOUT ── */
         .shell { display: flex; height: 100vh; width: 100%; position: relative; }
 
         /* ── SIDEBAR ── */
         .sidebar {
-            width: 280px; background: var(--bg-side); border-right: 1px solid var(--slate-200);
-            display: flex; flex-direction: column; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 100; flex-shrink: 0;
+            width: 280px; background: var(--bg-side); color: white;
+            display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100; flex-shrink: 0; position: relative;
+        }
+        .sidebar.collapsed { width: 0; overflow: hidden; transform: translateX(-280px); }
+
+        /* ── THE VERTICAL TOGGLE BAR ── */
+        .sidebar-toggle-handle {
+            position: absolute; right: -15px; top: 50%; transform: translateY(-50%);
+            width: 30px; height: 60px; background: var(--white); border: 1px solid var(--slate-200);
+            border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            gap: 2px; z-index: 110; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .handle-line { width: 2px; height: 20px; background: var(--slate-200); border-radius: 1px; }
+        .sidebar-toggle-handle:hover .handle-line { background: var(--primary); }
+
+        .brand { padding: 30px 24px; display: flex; align-items: center; gap: 12px; }
+        .nav-list { flex: 1; padding: 0 16px; }
+        .nav-item { 
+            padding: 12px 16px; border-radius: 12px; font-size: 14px; cursor: pointer; 
+            margin-bottom: 8px; transition: 0.2s; color: #94a3b8; 
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+
+        /* ── MAIN ── */
+        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--bg-main); }
+        .header { 
+            height: 70px; background: var(--white); border-bottom: 1px solid var(--slate-200); 
+            display: flex; align-items: center; justify-content: space-between; padding: 0 30px; 
         }
 
-        /* ── VERTICAL TOGGLE GRABBER (The "Lines" you asked for) ── */
-        .sidebar-handle {
-            position: absolute; right: -12px; top: 50%; transform: translateY(-50%);
-            width: 24px; height: 48px; background: var(--bg-main); border: 1px solid var(--slate-200);
-            border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            gap: 2px; box-shadow: var(--shadow-sm); z-index: 110;
+        /* ── MESSAGES ── */
+        .messages { flex: 1; overflow-y: auto; padding: 40px 20px; }
+        .container { max-width: 850px; margin: 0 auto; width: 100%; }
+
+        /* Welcome Screen Styling */
+        .welcome-screen { padding: 40px 0; text-align: center; }
+        .sample-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 40px; }
+        .sample-card { 
+            padding: 20px; background: var(--white); border: 1px solid var(--slate-200); 
+            border-radius: var(--radius); cursor: pointer; transition: 0.3s; text-align: left;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .sidebar-handle:hover { border-color: var(--primary); }
-        .handle-line { width: 2px; height: 16px; background: var(--slate-200); border-radius: 1px; }
-        .sidebar-handle:hover .handle-line { background: var(--primary); }
+        .sample-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .sample-card b { font-size: 15px; color: var(--slate-900); display: block; margin-bottom: 5px; }
+        .sample-card span { font-size: 13px; color: var(--slate-500); }
 
-        .brand { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--slate-200); }
-        .brand-icon { width: 32px; height: 32px; background: var(--slate-900); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
-        
-        .nav-list { flex: 1; overflow-y: auto; padding: 16px; }
-        .nav-label { font-size: 11px; font-weight: 600; color: var(--slate-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; padding-left: 8px; }
-        .nav-item { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; color: var(--slate-700); font-size: 14px; text-align: left; cursor: pointer; margin-bottom: 2px; }
-        .nav-item:hover { background: var(--slate-100); color: var(--primary); }
-
-        /* ── MAIN AREA ── */
-        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--bg-main); position: relative; }
-        
-        .header { height: 64px; border-bottom: 1px solid var(--slate-200); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
-        .header-actions { display: flex; gap: 8px; }
-        .btn-action { padding: 6px 12px; font-size: 13px; font-weight: 500; border: 1px solid var(--slate-200); border-radius: 6px; cursor: pointer; background: white; transition: 0.2s; }
-        .btn-action:hover { border-color: var(--slate-900); background: var(--slate-100); }
-        .btn-primary { background: var(--slate-900); color: white; border: none; }
-        .btn-primary:hover { background: #000; }
-
-        /* ── CHAT MESSAGES ── */
-        .messages { flex: 1; overflow-y: auto; padding: 40px 20px; display: flex; flex-direction: column; gap: 32px; }
-        .container { max-width: 760px; margin: 0 auto; width: 100%; }
-
-        .mrow { display: flex; gap: 20px; }
+        /* Chat Bubbles */
+        .mrow { display: flex; gap: 20px; margin-bottom: 40px; }
         .mrow.user { flex-direction: row-reverse; }
-        .avatar { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: 600; }
-        .bot .avatar { background: var(--slate-100); border: 1px solid var(--slate-200); }
+        .avatar { 
+            width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; 
+            justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 13px; 
+        }
+        .bot .avatar { background: var(--slate-900); color: white; }
         .user .avatar { background: var(--primary); color: white; }
 
-        .mcontent { display: flex; flex-direction: column; gap: 6px; max-width: 85%; }
-        .user .mcontent { align-items: flex-end; }
-        .bubble { font-size: 15px; line-height: 1.6; color: var(--slate-700); }
-        .user .bubble { background: var(--slate-100); padding: 12px 16px; border-radius: 12px 12px 0 12px; color: var(--slate-900); }
+        .bubble { 
+            background: var(--white); padding: 18px 24px; border-radius: var(--radius); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02); font-size: 15px; line-height: 1.7; 
+            color: #334155; max-width: 80%; border: 1px solid var(--slate-200);
+        }
+        .user .bubble { background: var(--primary); color: white; border: none; }
+
+        /* Links */
+        .bubble a { color: #2563eb; text-decoration: underline; font-weight: 500; }
+        .user .bubble a { color: #bfdbfe; }
 
         /* ── INPUT ZONE ── */
-        .input-area { padding: 24px; border-top: 1px solid var(--slate-200); }
-        .input-wrapper { max-width: 760px; margin: 0 auto; position: relative; background: white; border: 1px solid var(--slate-200); border-radius: 12px; padding: 10px 14px; box-shadow: var(--shadow-sm); }
-        .input-wrapper:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
-        textarea { width: 100%; border: none; outline: none; resize: none; font-family: inherit; font-size: 15px; max-height: 200px; padding-right: 40px; }
-        .send-btn { position: absolute; right: 10px; bottom: 10px; width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
-        .send-btn:disabled { background: var(--slate-200); }
-
-        /* ── MOBILE RESPONSIVENESS ── */
-        @media (max-width: 768px) {
-            .sidebar { position: absolute; left: 0; top: 0; bottom: 0; transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); }
-            .sidebar-handle { display: flex; }
-            .shell.sidebar-collapsed .sidebar { transform: translateX(-100%); }
+        .input-area { padding: 30px; background: var(--bg-main); }
+        .input-wrapper { 
+            max-width: 850px; margin: 0 auto; display: flex; align-items: center; 
+            background: var(--white); border: 1px solid var(--slate-200); 
+            padding: 12px 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        }
+        textarea { 
+            flex: 1; border: none; outline: none; resize: none; font-family: inherit; 
+            font-size: 15px; background: transparent; padding: 10px 0;
+        }
+        .send-btn { 
+            background: var(--primary); color: white; border: none; padding: 10px 20px; 
+            border-radius: 12px; cursor: pointer; font-weight: 600; margin-left: 15px;
         }
 
-        /* ── PRINT / PDF STYLES ── */
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 280px; }
+            .sidebar.collapsed { transform: translateX(-280px); }
+            .sample-grid { grid-template-columns: 1fr; }
+        }
+
         @media print {
-            .sidebar, .input-area, .header, .sidebar-handle { display: none !important; }
-            .main { height: auto !important; overflow: visible !important; }
-            .messages { padding: 0 !important; }
-            .container { max-width: 100% !important; }
-            .bubble { color: black !important; }
+            .sidebar, .input-area, .header, .sidebar-toggle-handle { display: none !important; }
+            .main { background: white !important; }
+            .bubble { box-shadow: none !important; border: 1px solid #eee !important; }
         }
     </style>
 </head>
-<body class="">
+<body>
 
-<div class="shell" id="shell">
+<div class="shell" id="appShell">
     
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-handle" onclick="toggleSidebar()">
+        <div class="sidebar-toggle-handle" onclick="toggleSidebar()">
             <div class="handle-line"></div>
             <div class="handle-line"></div>
         </div>
 
         <div class="brand">
-            <div class="brand-icon">🇮🇳</div>
-            <div style="font-weight: 600; letter-spacing: -0.5px;">SchemeSahayak</div>
+            <div style="font-size: 28px;">🏛️</div>
+            <div style="font-weight: 700; letter-spacing: -0.5px; font-size: 20px;">SchemeSahayak</div>
         </div>
 
         <div class="nav-list">
-            <div class="nav-label">Popular Categories</div>
-            <div class="nav-item" onclick="quickAsk('Farming schemes for small farmers')"><span>🌾</span> Agriculture</div>
-            <div class="nav-item" onclick="quickAsk('Business loan schemes')"><span>💼</span> Business</div>
-            <div class="nav-item" onclick="quickAsk('Scholarships for students')"><span>📚</span> Education</div>
-            <div class="nav-item" onclick="quickAsk('Health insurance schemes')"><span>🏥</span> Health</div>
+            <div style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 15px; padding-left: 16px;">CATEGORIES</div>
+            <p class="nav-item" onclick="quickAsk('Farming and Agriculture schemes')">🌾 Agriculture</p>
+            <p class="nav-item" onclick="quickAsk('Small business and MSME loans')">💼 Business</p>
+            <p class="nav-item" onclick="quickAsk('Scholarships for students')">🎓 Education</p>
+            <p class="nav-item" onclick="quickAsk('Healthcare and insurance schemes')">🏥 Healthcare</p>
         </div>
 
-        <div style="padding: 24px; border-top: 1px solid var(--slate-200); font-size: 12px; color: var(--slate-500);">
+        <div style="padding: 24px; font-size: 12px; color: #475569; border-top: 1px solid rgba(255,255,255,0.05);">
             <div style="display:flex; align-items:center; gap:8px;">
-                <div style="width:8px; height:8px; background:var(--green); border-radius:50%;"></div>
-                Systems Operational
+                <div style="width:8px; height:8px; background:#10b981; border-radius:50%;"></div>
+                AI Assistant Online
             </div>
         </div>
     </aside>
 
     <main class="main">
         <header class="header">
-            <div style="font-weight: 500; font-size: 14px; color: var(--slate-500);">AI Assistant</div>
-            <div class="header-actions">
-                <button class="btn-action" onclick="downloadPDF()">Download PDF</button>
-                <button class="btn-action btn-primary" onclick="window.location.reload()">New Chat</button>
+            <div style="font-weight: 600; font-size: 14px; color: var(--slate-500);">GOVERNMENT BENEFITS GUIDE</div>
+            <div style="display:flex; gap:10px;">
+                <button class="send-btn" style="background:#f1f5f9; color:var(--slate-900); border:1px solid var(--slate-200)" onclick="window.print()">Export to PDF</button>
+                <button class="send-btn" onclick="window.location.reload()">New Session</button>
             </div>
         </header>
 
-        <div class="messages" id="messages">
-            <div class="container" id="chatContainer">
-                <div style="text-align: center; padding: 40px 0;">
-                    <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 12px; letter-spacing: -1px;">How can I help you today?</h1>
-                    <p style="color: var(--slate-500); font-size: 16px;">Search 15+ Central and State Government schemes instantly.</p>
+        <div class="messages" id="msgBox">
+            <div class="container">
+                <div class="welcome-screen" id="welcome">
+                    <h1 style="font-size: 42px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 15px; color: var(--slate-900);">Namaste, Citizen.</h1>
+                    <p style="color:var(--slate-500); font-size: 18px; max-width: 600px; margin: 0 auto;">Discover the government benefits and schemes you are eligible for in seconds.</p>
+                    
+                    <div class="sample-grid">
+                        <div class="sample-card" onclick="quickAsk('What schemes are available for small farmers?')">
+                            <b>🚜 Farming & Agriculture</b>
+                            <span>Explore PM-Kisan, KCC, and irrigation support.</span>
+                        </div>
+                        <div class="sample-card" onclick="quickAsk('Loans for starting a small business or shop')">
+                            <b>💼 Small Business Loans</b>
+                            <span>Details on MUDRA and Stand-Up India.</span>
+                        </div>
+                        <div class="sample-card" onclick="quickAsk('Scholarships for my daughter\'s education')">
+                            <b>🎓 Education & Scholarships</b>
+                            <span>Central and State level student support.</span>
+                        </div>
+                        <div class="sample-card" onclick="quickAsk('Health insurance for poor families')">
+                            <b>🏥 Medical & Health</b>
+                            <span>Ayushman Bharat and health cards.</span>
+                        </div>
+                    </div>
                 </div>
-                </div>
-            <div id="typing" style="display:none; font-size: 13px; color: var(--slate-400); margin-left: 52px;">AI is researching...</div>
+                <div id="chatThread"></div>
+                <div id="typing" style="display:none; color:var(--slate-500); font-size: 13px; padding: 20px;">Researching schemes...</div>
+            </div>
         </div>
 
         <div class="input-area">
             <div class="input-wrapper">
-                <textarea id="userInput" rows="1" placeholder="Type a scheme name or your situation..." onkeydown="handleKey(event)" oninput="autoGrow(this)"></textarea>
-                <button class="send-btn" id="sendBtn" onclick="handleSend()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </button>
+                <textarea id="userInput" rows="1" placeholder="Type your situation (e.g., 'I am a 10th pass student looking for a scholarship')" onkeydown="checkKey(event)"></textarea>
+                <button class="send-btn" id="sendBtn" onclick="handleSend()">Ask AI</button>
             </div>
-            <p style="text-align: center; font-size: 11px; color: var(--slate-400); margin-top: 12px;">Press Enter to send. Shift + Enter for new line.</p>
         </div>
     </main>
 </div>
 
 <script>
-    const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:8000/chat' : '/chat';
-    const messagesEl = document.getElementById('chatContainer');
-    const inputEl = document.getElementById('userInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const typingEl = document.getElementById('typing');
+    const API = window.location.hostname === 'localhost' ? 'http://localhost:8000/chat' : '/chat';
+    const chatThread = document.getElementById('chatThread');
+    const welcome = document.getElementById('welcome');
+    const input = document.getElementById('userInput');
+    const typing = document.getElementById('typing');
 
-    // Sidebar Toggle Logic
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
+    function toggleSidebar() { 
+        document.getElementById('sidebar').classList.toggle('collapsed');
     }
 
-    // PDF Download Logic
-    function downloadPDF() {
-        window.print();
-    }
+    function checkKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }
+    function quickAsk(q) { input.value = q; handleSend(); }
 
-    function autoGrow(el) {
-        el.style.height = 'auto';
-        el.style.height = el.scrollHeight + 'px';
-    }
-
-    function handleKey(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
-        }
-    }
-
-    function quickAsk(text) {
-        inputEl.value = text;
-        autoGrow(inputEl);
-        handleSend();
+    function formatAIResponse(text) {
+        let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        formatted = formatted.replace(/\n/g, '<br>');
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        return formatted.replace(urlRegex, url => `<a href="${url}" target="_blank">${url}</a>`);
     }
 
     function addMessage(text, role) {
-        const div = document.createElement('div');
-        div.className = `mrow ${role}`;
-        div.style.marginBottom = "32px";
-        
-        const avatar = role === 'user' ? 'U' : 'AI';
-        const formattedText = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-        div.innerHTML = `
-            <div class="avatar">${avatar}</div>
-            <div class="mcontent">
-                <div style="font-size:12px; font-weight:600; color:var(--slate-500); margin-bottom:4px;">${role === 'user' ? 'You' : 'SchemeSahayak'}</div>
-                <div class="bubble">${formattedText}</div>
-            </div>
+        welcome.style.display = 'none';
+        const row = document.createElement('div');
+        row.className = `mrow ${role}`;
+        row.innerHTML = `
+            <div class="avatar">${role === 'user' ? 'YOU' : 'AI'}</div>
+            <div class="bubble">${role === 'bot' ? formatAIResponse(text) : text}</div>
         `;
-        messagesEl.appendChild(div);
-        document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        chatThread.appendChild(row);
+        const box = document.getElementById('msgBox');
+        box.scrollTop = box.scrollHeight;
     }
 
     async function handleSend() {
-        const val = inputEl.value.trim();
-        if (!val) return;
-
+        const val = input.value.trim();
+        if(!val) return;
         addMessage(val, 'user');
-        inputEl.value = '';
-        inputEl.style.height = 'auto';
-        
-        sendBtn.disabled = true;
-        typingEl.style.display = 'block';
-
+        input.value = '';
+        typing.style.display = 'block';
         try {
-            const res = await fetch(API_URL, {
+            const res = await fetch(API, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ message: val })
             });
             const data = await res.json();
-            typingEl.style.display = 'none';
+            typing.style.display = 'none';
             addMessage(data.response, 'bot');
-        } catch (err) {
-            typingEl.style.display = 'none';
-            addMessage("Error: Could not connect to the API. Ensure your backend is running.", "bot");
-        } finally {
-            sendBtn.disabled = false;
+        } catch (e) {
+            typing.style.display = 'none';
+            addMessage("Server busy. Please try again in a moment.", 'bot');
         }
     }
 </script>
