@@ -5,208 +5,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>SchemeSahayak — Official Government AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <style>
         :root {
             --bg-side: #0f172a; 
-            --bg-main: linear-gradient(180deg, rgba(255, 153, 51, 0.12) 0%, #ffffff 50%, rgba(19, 136, 8, 0.12) 100%);
+            --bg-main: radial-gradient(at 0% 0%, rgba(255, 153, 51, 0.15) 0px, transparent 50%), 
+                       radial-gradient(at 100% 100%, rgba(19, 136, 8, 0.15) 0px, transparent 50%),
+                       #ffffff;
             --primary: #4f46e5; 
             --slate-200: #e2e8f0;
             --slate-400: #94a3b8;
             --slate-500: #64748b;
             --slate-800: #1e293b;
             --saffron: #FF9933;
-            --green: #138808;
+            --navy: #000080;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-main); background-attachment: fixed; overflow: hidden; height: 100vh; width: 100%; color: var(--slate-800); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--slate-800); }
 
         .shell { display: flex; height: 100vh; width: 100%; position: relative; }
 
-        /* ── SIDEBAR ── */
+        /* ── SIDEBAR FIX ── */
         .sidebar {
             width: 280px; background: var(--bg-side); color: white;
-            display: flex; flex-direction: column; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1000; flex-shrink: 0; box-shadow: 4px 0 20px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; transition: transform 0.3s ease;
+            z-index: 1000; flex-shrink: 0;
         }
         
-        @media (min-width: 769px) { .sidebar.collapsed { margin-left: -280px; } }
-        @media (max-width: 768px) { .sidebar { position: fixed; left: 0; height: 100%; transform: translateX(-100%); } .sidebar.active { transform: translateX(0); } }
+        @media (max-width: 768px) { 
+            .sidebar { position: fixed; left: 0; height: 100%; transform: translateX(-100%); } 
+            .sidebar.active { transform: translateX(0); } 
+        }
 
-        /* ── MINIMALIST TOGGLE (TOP LEFT) ── */
         .sidebar-toggle {
             position: absolute; left: 16px; top: 16px; 
-            width: 42px; height: 42px; background: white; border: 1px solid var(--slate-200);
+            width: 42px; height: 42px; background: white; border: 1.5px solid var(--slate-200);
             border-radius: 10px; cursor: pointer; display: flex; flex-direction: column; 
             align-items: center; justify-content: center; gap: 4px; z-index: 1001; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
-        .sidebar-toggle:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(0,0,0,0.12); }
-        .bar { width: 20px; height: 2px; background: var(--bg-side); border-radius: 2px; transition: 0.3s; }
+        .bar { width: 18px; height: 2px; background: var(--bg-side); border-radius: 2px; }
 
-        .brand { padding: 28px 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-        .brand span { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; }
+        .brand { padding: 24px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        @media (max-width: 768px) { .brand { padding-left: 64px; } }
 
         .btn-new-chat {
-            margin: 16px; padding: 12px; border-radius: 12px; background: rgba(255, 153, 51, 0.1); 
-            color: var(--saffron); border: 1px solid rgba(255, 153, 51, 0.3); text-align: center; 
-            cursor: pointer; font-weight: 700; font-size: 14px; transition: 0.2s;
+            margin: 16px; padding: 12px; border-radius: 10px; background: rgba(255, 153, 51, 0.15); 
+            color: var(--saffron); border: 1px solid rgba(255, 153, 51, 0.4); text-align: center; 
+            cursor: pointer; font-weight: 700; font-size: 14px;
         }
-        .btn-new-chat:hover { background: rgba(255, 153, 51, 0.2); }
 
-        .sidebar-scroll { flex: 1; overflow-y: auto; padding: 0 16px; scrollbar-width: thin; }
-        .section-title { font-size: 11px; color: var(--slate-500); margin: 24px 0 12px 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; }
-
-        .nav-item { 
-            font-size: 14px; color: var(--slate-400); padding: 12px 14px; border-radius: 10px; 
-            cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s;
-            margin-bottom: 4px;
+        /* ── HISTORY STYLES ── */
+        .history-item {
+            padding: 10px 12px; margin-bottom: 5px; border-radius: 8px; font-size: 13px;
+            color: var(--slate-400); cursor: pointer; white-space: nowrap; overflow: hidden;
+            text-overflow: ellipsis; transition: 0.2s;
         }
-        .nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
-        .nav-item.active { background: var(--primary); color: white; }
+        .history-item:hover { background: rgba(255,255,255,0.1); color: white; }
 
-        /* ── MAIN AREA ── */
-        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
-        
+        /* ── TOP BAR & EXPORT ── */
         .top-bar { 
             height: 74px; display: flex; align-items: center; justify-content: flex-end; 
-            padding: 0 24px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
+            padding: 0 24px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--slate-200); position: sticky; top: 0; z-index: 900;
         }
-
-        .chat-container { flex: 1; overflow-y: auto; padding: 20px 20px 160px; scroll-behavior: smooth; }
-        .center-wrap { max-width: 850px; margin: 0 auto; width: 100%; }
-
-        /* Welcome UI */
-        .welcome-hero { text-align: center; padding: 60px 0; animation: fadeIn 0.8s ease-out; }
-        .welcome-hero h1 { font-size: 38px; font-weight: 800; margin-bottom: 12px; letter-spacing: -1px; }
-        
-        .sample-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 40px; }
-        .sample-card { 
-            background: white; padding: 20px; border-radius: 16px; border: 1px solid var(--slate-200);
-            cursor: pointer; transition: 0.3s; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        .btn-export {
+            background: transparent; border: 2px solid var(--navy); color: var(--navy); 
+            padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;
         }
-        .sample-card:hover { border-color: var(--saffron); transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,0,0,0.06); }
-        .sample-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-        .sample-card p { font-size: 13px; color: var(--slate-500); line-height: 1.4; }
 
-        /* ── MESSAGES ── */
-        .msg-row { display: flex; flex-direction: column; margin-bottom: 32px; animation: slideUp 0.4s ease-out; }
-        .msg-row.user { align-items: flex-end; }
-        
-        .bubble { 
-            background: white; padding: 20px 24px; border-radius: 20px; border: 1px solid var(--slate-200); 
-            max-width: 85%; line-height: 1.7; font-size: 15.5px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-        }
-        .user .bubble { background: var(--slate-800); color: white; border: none; border-bottom-right-radius: 4px; }
-        .bot .bubble { border-bottom-left-radius: 4px; }
+        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
+        .chat-container { flex: 1; overflow-y: auto; padding: 20px 20px 140px; scroll-behavior: smooth; }
+        .center-wrap { max-width: 800px; margin: 0 auto; width: 100%; }
 
-        /* ── SCHEME DATA CARDS ── */
-        .scheme-result {
-            background: #fdfdfd; border: 1px solid var(--slate-200); border-left: 5px solid var(--saffron);
-            padding: 20px; margin: 18px 0; border-radius: 12px;
-        }
-        .scheme-tag { font-size: 10px; font-weight: 800; color: var(--saffron); text-transform: uppercase; margin-bottom: 8px; }
-        .scheme-result h3 { font-size: 19px; margin-bottom: 8px; color: var(--slate-800); }
-        .scheme-detail { font-size: 14px; color: var(--slate-500); margin-bottom: 12px; }
-        .apply-btn {
-            display: inline-flex; align-items: center; gap: 8px; background: var(--primary); color: white !important;
-            padding: 10px 22px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 700; transition: 0.2s;
-        }
-        .apply-btn:hover { opacity: 0.9; transform: scale(1.02); }
-
-        /* ── LIFTED INPUT ── */
-        .bottom-shelf { position: absolute; bottom: 35px; left: 0; right: 0; padding: 0 20px; z-index: 50; }
+        /* ── INPUT ── */
+        .bottom-shelf { position: absolute; bottom: 30px; left: 0; right: 0; padding: 0 20px; z-index: 50; }
         .input-box { 
-            max-width: 850px; margin: 0 auto; display: flex; align-items: flex-end; 
-            background: white; border: 1px solid var(--slate-200); padding: 12px 16px; 
-            border-radius: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            max-width: 800px; margin: 0 auto; display: flex; align-items: center; 
+            background: white; border: 1.5px solid var(--slate-200); padding: 10px 16px; 
+            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-        textarea { flex: 1; border: none; outline: none; resize: none; font-size: 16px; padding: 10px 12px; max-height: 150px; background: transparent; }
-        .btn-send { background: var(--primary); color: white; border: none; height: 44px; width: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
-        .btn-send:hover { transform: rotate(-15deg) scale(1.1); }
+        textarea { flex: 1; border: none; outline: none; resize: none; font-size: 16px; padding: 8px; max-height: 120px; }
+        .btn-send { background: var(--primary); color: white; border: none; padding: 10px 22px; border-radius: 12px; cursor: pointer; font-weight: 700; }
 
-        .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 999; backdrop-filter: blur(6px); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 999; backdrop-filter: blur(4px); }
         @media (max-width: 768px) { .sidebar.active + .overlay { display: block; } }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="shell">
     <div class="overlay" onclick="toggleSidebar()"></div>
-    
     <div class="sidebar-toggle" onclick="toggleSidebar()">
-        <div class="bar"></div>
-        <div class="bar" style="width: 14px;"></div>
-        <div class="bar"></div>
+        <div class="bar"></div><div class="bar" style="width: 14px;"></div><div class="bar"></div>
     </div>
 
     <aside class="sidebar" id="sidebar">
-        <div class="brand"><span>🇮🇳 SchemeSahayak</span></div>
-        <div class="btn-new-chat" onclick="location.reload()">+ Start New Conversation</div>
+        <div class="brand"><span style="font-size: 22px;">🇮🇳</span><span>SchemeSahayak</span></div>
+        <div class="btn-new-chat" onclick="clearCurrentChat()">+ New Conversation</div>
         
-        <div class="sidebar-scroll">
-            <p class="section-title">Explore Categories</p>
-            <div class="nav-item" onclick="quickAsk('Farming & Agriculture schemes')">🌾 Agriculture</div>
-            <div class="nav-item" onclick="quickAsk('Healthcare & Ayushman Bharat')">🏥 Healthcare</div>
-            <div class="nav-item" onclick="quickAsk('Scholarships for students')">🎓 Education</div>
-            <div class="nav-item" onclick="quickAsk('Startup & Business Loans')">💼 Business</div>
-            <div class="nav-item" onclick="quickAsk('Housing & PMAY')">🏠 Housing</div>
-            <div class="nav-item" onclick="quickAsk('Employment & MGNREGA')">🛠️ Employment</div>
-
-            <p class="section-title">Recent Activity</p>
-            <div id="historyList">
-                <div style="font-size: 12px; color: var(--slate-500); padding: 10px 14px; font-style: italic;">No recent history</div>
-            </div>
+        <div style="flex:1; overflow-y:auto; padding: 10px 20px;">
+            <p style="font-size:11px; color:var(--slate-500); font-weight:700; margin-bottom:15px; text-transform:uppercase;">Recent History</p>
+            <div id="historyContainer"></div>
         </div>
     </aside>
 
     <main class="main">
-        <div class="top-bar">
-            <button style="background:none; border: 1px solid var(--slate-200); padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;">Export PDF</button>
-        </div>
-
+        <div class="top-bar"><button class="btn-export" onclick="window.print()">Export to PDF</button></div>
         <div class="chat-container" id="chatContainer">
             <div class="center-wrap">
-                <div id="welcome" class="welcome-hero">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" style="width:70px; opacity:0.25; margin-bottom:24px;">
+                <div id="welcome" class="welcome-hero" style="text-align: center; padding: 40px 0;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" style="width:60px; opacity:0.4; margin-bottom:20px;">
                     <h1>Namaste 🇮🇳</h1>
-                    <p style="color:var(--slate-500); font-size: 18px;">How can I help you find government benefits today?</p>
-                    
-                    <div class="sample-grid">
-                        <div class="sample-card" onclick="quickAsk('I am a farmer, what benefits can I get?')">
-                            <h4>🌾 Agriculture Support</h4>
-                            <p>Learn about PM-KISAN, KCC, and crop insurance subsidies.</p>
-                        </div>
-                        <div class="sample-card" onclick="quickAsk('Loans for small businesses and startups')">
-                            <h4>💼 Business & Growth</h4>
-                            <p>Explore MUDRA loans, Stand Up India, and startup recognition.</p>
-                        </div>
-                        <div class="sample-card" onclick="quickAsk('Health insurance for poor families')">
-                            <h4>🏥 Health & Wellness</h4>
-                            <p>Details on Ayushman Bharat (PM-JAY) and health cards.</p>
-                        </div>
-                        <div class="sample-card" onclick="quickAsk('Scholarships for higher education')">
-                            <h4>🎓 Student Empowerment</h4>
-                            <p>Find National Scholarship Portal (NSP) and girl child schemes.</p>
-                        </div>
-                    </div>
+                    <p style="color:var(--slate-500);">Your history is now saved automatically.</p>
                 </div>
                 <div id="chatThread"></div>
-                <div id="typing" style="display:none; color:var(--slate-400); font-size:13px; margin: 10px 0;">Searching official 2026 database...</div>
             </div>
         </div>
-
         <div class="bottom-shelf">
             <div class="input-box">
-                <textarea id="userInput" rows="1" placeholder="Describe your situation (e.g., 'I want to start a shop')"></textarea>
-                <button class="btn-send" onclick="handleSend()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </button>
+                <textarea id="userInput" rows="1" placeholder="Ask about a scheme..."></textarea>
+                <button class="btn-send" onclick="handleSend()">Send</button>
             </div>
         </div>
     </main>
@@ -215,93 +135,94 @@
 <script>
     const input = document.getElementById('userInput');
     const chatContainer = document.getElementById('chatContainer');
-    const historyList = document.getElementById('historyList');
+    const chatThread = document.getElementById('chatThread');
+    const historyContainer = document.getElementById('historyContainer');
 
-    // Toggle logic for mobile and desktop
+    // ── PERSISTENCE LOGIC ──
+    let currentChat = JSON.parse(localStorage.getItem('currentChat')) || [];
+
+    window.onload = () => {
+        renderHistory();
+        if (currentChat.length > 0) {
+            document.getElementById('welcome').style.display = 'none';
+            currentChat.forEach(msg => displayMessage(msg.text, msg.role, false));
+        }
+    };
+
     function toggleSidebar() {
         const sb = document.getElementById('sidebar');
-        if (window.innerWidth <= 768) {
-            sb.classList.toggle('active');
-        } else {
-            sb.classList.toggle('collapsed');
+        window.innerWidth <= 768 ? sb.classList.toggle('active') : sb.classList.toggle('collapsed');
+    }
+
+    function saveChat() {
+        localStorage.setItem('currentChat', JSON.stringify(currentChat));
+        updateHistorySidebar();
+    }
+
+    function clearCurrentChat() {
+        if(currentChat.length > 0) {
+            let allHistory = JSON.parse(localStorage.getItem('allHistory')) || [];
+            allHistory.unshift({ title: currentChat[0].text, data: currentChat });
+            localStorage.setItem('allHistory', JSON.stringify(allHistory.slice(0, 10))); // Keep last 10
         }
+        localStorage.removeItem('currentChat');
+        location.reload();
     }
 
-    // Auto-expand textarea
-    input.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-    });
-
-    function quickAsk(q) { 
-        if(window.innerWidth <= 768) toggleSidebar(); 
-        input.value = q; 
-        handleSend(); 
+    function updateHistorySidebar() {
+        renderHistory();
     }
 
-    // Beauty Parser for Scraper Data
-    function parseBotResponse(text) {
-        let fmt = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        
-        // Dictionary matching your scraper categories
-        const directory = [
-            { key: "PM-KISAN", url: "https://pmkisan.gov.in", desc: "₹6,000 yearly income support for farmers." },
-            { key: "Ayushman Bharat", url: "https://pmjay.gov.in", desc: "₹5 Lakh free health cover for families." },
-            { key: "MUDRA Loan", url: "https://www.mudra.org.in", desc: "Collateral-free loans up to ₹10 Lakh." },
-            { key: "Startup India", url: "https://www.startupindia.gov.in", desc: "Tax benefits and funding for new ventures." },
-            { key: "Sukanya Samriddhi", url: "https://www.india.gov.in/sukanya-samriddhi-yojana", desc: "Savings scheme for the girl child (8.2% interest)." }
-        ];
-
-        directory.forEach(scheme => {
-            const regex = new RegExp(scheme.key, "g");
-            fmt = fmt.replace(regex, `
-                <div class="scheme-result">
-                    <div class="scheme-tag">Official Government Scheme</div>
-                    <h3>${scheme.key}</h3>
-                    <div class="scheme-detail">${scheme.desc}</div>
-                    <a href="${scheme.url}" class="apply-btn" target="_blank">Apply Now ↗</a>
-                </div>
-            `);
+    function renderHistory() {
+        const allHistory = JSON.parse(localStorage.getItem('allHistory')) || [];
+        historyContainer.innerHTML = allHistory.length ? '' : '<div style="font-size:12px; color:#555;">No history yet</div>';
+        allHistory.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.innerText = item.title;
+            div.onclick = () => loadHistoryItem(index);
+            historyContainer.appendChild(div);
         });
-
-        return fmt.replace(/\n/g, '<br>');
     }
 
-    function addMessage(text, role) {
+    function loadHistoryItem(index) {
+        const allHistory = JSON.parse(localStorage.getItem('allHistory')) || [];
+        currentChat = allHistory[index].data;
+        localStorage.setItem('currentChat', JSON.stringify(currentChat));
+        location.reload();
+    }
+
+    function displayMessage(text, role, save = true) {
         document.getElementById('welcome').style.display = 'none';
         const row = document.createElement('div');
-        row.className = `msg-row ${role}`;
+        row.style.marginBottom = '20px';
+        row.style.display = 'flex';
+        row.style.flexDirection = 'column';
+        row.style.alignItems = role === 'user' ? 'flex-end' : 'flex-start';
+        
         row.innerHTML = `
-            <div style="font-size:11px; font-weight:800; color:var(--slate-500); margin-bottom:6px; padding: 0 4px;">${role === 'user' ? 'YOU' : 'SCHEMESAHAYAK 🇮🇳'}</div>
-            <div class="bubble">${role === 'bot' ? parseBotResponse(text) : text}</div>
+            <div style="font-size:10px; font-weight:800; color:var(--slate-500); margin-bottom:5px;">${role.toUpperCase()}</div>
+            <div style="background:${role === 'user' ? 'var(--slate-800)' : 'white'}; color:${role === 'user' ? 'white' : 'inherit'}; padding:15px; border-radius:15px; max-width:85%; border:${role === 'bot' ? '1px solid var(--slate-200)' : 'none'}; line-height:1.6;">${text}</div>
         `;
-        document.getElementById('chatThread').appendChild(row);
+        chatThread.appendChild(row);
         chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        if (save) {
+            currentChat.push({ text, role });
+            saveChat();
+        }
     }
 
     async function handleSend() {
         const val = input.value.trim();
         if(!val) return;
-        
-        addMessage(val, 'user');
+        displayMessage(val, 'user');
         input.value = '';
-        input.style.height = 'auto';
-        document.getElementById('typing').style.display = 'block';
-
-        // Connect this to your Flask/FastAPI backend
-        try {
-            const response = await fetch('/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: val })
-            });
-            const data = await response.json();
-            document.getElementById('typing').style.display = 'none';
-            addMessage(data.response, 'bot');
-        } catch (err) {
-            document.getElementById('typing').style.display = 'none';
-            addMessage("Namaste. I am having trouble reaching the official database right now. Please check your internet or try again later.", 'bot');
-        }
+        
+        // Mock API Call - Replace with your FastAPI call
+        setTimeout(() => {
+            displayMessage("I have saved this conversation to your local history. How else can I help?", 'bot');
+        }, 600);
     }
 </script>
 </body>
