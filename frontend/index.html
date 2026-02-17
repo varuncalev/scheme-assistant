@@ -1,265 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SchemeSahayak - Government Benefits Assistant</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <title>SchemeSahayak — Professional AI Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <style>
         :root {
-            --saffron: #FF6B2B;
-            --saffron-light: #FF8C55;
-            --saffron-glow: rgba(255, 107, 43, 0.15);
-            --green: #00C896;
-            --green-dim: rgba(0, 200, 150, 0.12);
-            --ink: #0A0F1E;
-            --ink-2: #111827;
-            --ink-3: #1C2537;
-            --ink-4: #263047;
-            --mist: #8892A4;
-            --fog: #BCC5D3;
-            --white: #F4F7FA;
-            --border: rgba(255,255,255,0.07);
-            --border-active: rgba(255, 107, 43, 0.4);
-            --shadow: 0 20px 60px rgba(0,0,0,0.4);
-            --radius: 20px;
-            --radius-sm: 12px;
+            --bg-main: #ffffff;
+            --bg-side: #f8fafc;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --slate-900: #0f172a;
+            --slate-700: #334155;
+            --slate-500: #64748b;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --green: #10b981;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --font: 'Inter', system-ui, sans-serif;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font); background: var(--bg-main); color: var(--slate-900); overflow: hidden; height: 100vh; }
 
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--ink);
-            color: var(--white);
-        }
-
-        /* ── AMBIENT BACKGROUND ── */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 999;
-            opacity: 0.4;
-        }
-
-        .glow-orb {
-            position: fixed; border-radius: 50%; filter: blur(80px);
-            pointer-events: none; z-index: 0;
-        }
-        .glow-orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,107,43,0.08) 0%, transparent 70%); top: -100px; right: -100px; }
-        .glow-orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,200,150,0.06) 0%, transparent 70%); bottom: -50px; left: -50px; }
-
-        /* ── APP LAYOUT ── */
-        .app { display: grid; grid-template-columns: 300px 1fr; grid-template-rows: 100vh; height: 100vh; position: relative; z-index: 1; }
+        /* ── LAYOUT ── */
+        .shell { display: flex; height: 100vh; width: 100%; position: relative; }
 
         /* ── SIDEBAR ── */
         .sidebar {
-            background: var(--ink-2); border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; padding: 28px 22px; gap: 24px;
-            overflow-y: auto; scrollbar-width: none;
+            width: 280px; background: var(--bg-side); border-right: 1px solid var(--slate-200);
+            display: flex; flex-direction: column; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100; flex-shrink: 0;
         }
-        .brand { display: flex; align-items: center; gap: 14px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
-        .brand-flag {
-            width: 48px; height: 48px; background: linear-gradient(135deg, var(--saffron), #FF4500);
-            border-radius: 14px; display: flex; align-items: center; justify-content: center;
-            font-size: 24px; box-shadow: 0 8px 24px rgba(255,107,43,0.3);
+
+        /* ── VERTICAL TOGGLE GRABBER (The "Lines" you asked for) ── */
+        .sidebar-handle {
+            position: absolute; right: -12px; top: 50%; transform: translateY(-50%);
+            width: 24px; height: 48px; background: var(--bg-main); border: 1px solid var(--slate-200);
+            border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            gap: 2px; box-shadow: var(--shadow-sm); z-index: 110;
         }
-        .brand-text h1 { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; color: var(--white); }
+        .sidebar-handle:hover { border-color: var(--primary); }
+        .handle-line { width: 2px; height: 16px; background: var(--slate-200); border-radius: 1px; }
+        .sidebar-handle:hover .handle-line { background: var(--primary); }
 
-        .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-box { background: var(--ink-3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; text-align: center; }
-        .stat-box .num { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: var(--saffron); }
-
-        .nav-item {
-            display: flex; align-items: center; gap: 12px; padding: 13px 16px;
-            border-radius: var(--radius-sm); border: 1px solid transparent;
-            cursor: pointer; transition: 0.2s; font-size: 14px; font-weight: 500;
-            color: var(--fog); background: transparent; width: 100%; text-align: left;
-        }
-        .nav-item:hover { background: var(--ink-3); color: var(--white); transform: translateX(3px); }
-        .nav-icon { width: 34px; height: 34px; background: var(--ink-4); border-radius: 9px; display: flex; align-items: center; justify-content: center; }
-
-        /* ── MAIN CHAT ── */
-        .main { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .topbar { padding: 18px 28px; background: var(--ink-2); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .brand { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--slate-200); }
+        .brand-icon { width: 32px; height: 32px; background: var(--slate-900); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
         
-        .status-pill { display: flex; align-items: center; gap: 8px; background: var(--green-dim); padding: 7px 14px; border-radius: 50px; color: var(--green); font-size: 12px; }
-        .status-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0,200,150,0.4); } 70% { box-shadow: 0 0 0 10px rgba(0,200,150,0); } 100% { box-shadow: 0 0 0 0 rgba(0,200,150,0); } }
+        .nav-list { flex: 1; overflow-y: auto; padding: 16px; }
+        .nav-label { font-size: 11px; font-weight: 600; color: var(--slate-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; padding-left: 8px; }
+        .nav-item { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; color: var(--slate-700); font-size: 14px; text-align: left; cursor: pointer; margin-bottom: 2px; }
+        .nav-item:hover { background: var(--slate-100); color: var(--primary); }
 
-        .icon-action { width: 38px; height: 38px; background: var(--ink-3); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--mist); transition: 0.2s; }
-        .icon-action:hover { border-color: var(--saffron); color: var(--saffron); }
-
-        .messages { flex: 1; overflow-y: auto; padding: 28px; display: flex; flex-direction: column; gap: 20px; }
-        .welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; gap: 20px; }
-        .welcome-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 500px; }
-        .welcome-card { background: var(--ink-3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; cursor: pointer; transition: 0.2s; font-size: 13px; color: var(--fog); text-align: left; }
-        .welcome-card:hover { border-color: var(--saffron); transform: translateY(-2px); }
-
-        /* ── MESSAGE BUBBLES ── */
-        .message { display: flex; gap: 12px; max-width: 80%; animation: fadeUp 0.3s ease-out; }
-        .message.user { align-self: flex-end; flex-direction: row-reverse; }
-        .bubble { padding: 14px 18px; border-radius: 18px; font-size: 14px; line-height: 1.6; }
-        .message.user .bubble { background: linear-gradient(135deg, var(--saffron), #FF4500); color: white; border-bottom-right-radius: 4px; }
-        .message.bot .bubble { background: var(--ink-3); border: 1px solid var(--border); color: var(--fog); border-bottom-left-radius: 4px; }
+        /* ── MAIN AREA ── */
+        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--bg-main); position: relative; }
         
-        /* ── INPUT AREA ── */
-        .input-zone { padding: 20px 28px; background: var(--ink-2); border-top: 1px solid var(--border); }
-        .input-box { display: flex; align-items: flex-end; gap: 10px; background: var(--ink-3); border: 1px solid var(--border); border-radius: 18px; padding: 10px 15px; }
-        textarea { flex: 1; background: transparent; border: none; outline: none; color: white; resize: none; max-height: 120px; font-family: inherit; }
-        .send-btn { width: 42px; height: 42px; background: var(--saffron); border: none; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .header { height: 64px; border-bottom: 1px solid var(--slate-200); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+        .header-actions { display: flex; gap: 8px; }
+        .btn-action { padding: 6px 12px; font-size: 13px; font-weight: 500; border: 1px solid var(--slate-200); border-radius: 6px; cursor: pointer; background: white; transition: 0.2s; }
+        .btn-action:hover { border-color: var(--slate-900); background: var(--slate-100); }
+        .btn-primary { background: var(--slate-900); color: white; border: none; }
+        .btn-primary:hover { background: #000; }
 
-        /* ── MOBILE FIXES ── */
-        .menu-btn { display: none; font-size: 20px; background: none; border: none; color: white; cursor: pointer; }
-        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 150; backdrop-filter: blur(4px); }
+        /* ── CHAT MESSAGES ── */
+        .messages { flex: 1; overflow-y: auto; padding: 40px 20px; display: flex; flex-direction: column; gap: 32px; }
+        .container { max-width: 760px; margin: 0 auto; width: 100%; }
 
-        @media (max-width: 900px) {
-            .app { grid-template-columns: 1fr; }
-            .sidebar { position: fixed; left: -300px; width: 280px; height: 100vh; z-index: 200; transition: 0.3s; }
-            .sidebar.open { left: 0; }
-            .menu-btn { display: block; }
+        .mrow { display: flex; gap: 20px; }
+        .mrow.user { flex-direction: row-reverse; }
+        .avatar { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: 600; }
+        .bot .avatar { background: var(--slate-100); border: 1px solid var(--slate-200); }
+        .user .avatar { background: var(--primary); color: white; }
+
+        .mcontent { display: flex; flex-direction: column; gap: 6px; max-width: 85%; }
+        .user .mcontent { align-items: flex-end; }
+        .bubble { font-size: 15px; line-height: 1.6; color: var(--slate-700); }
+        .user .bubble { background: var(--slate-100); padding: 12px 16px; border-radius: 12px 12px 0 12px; color: var(--slate-900); }
+
+        /* ── INPUT ZONE ── */
+        .input-area { padding: 24px; border-top: 1px solid var(--slate-200); }
+        .input-wrapper { max-width: 760px; margin: 0 auto; position: relative; background: white; border: 1px solid var(--slate-200); border-radius: 12px; padding: 10px 14px; box-shadow: var(--shadow-sm); }
+        .input-wrapper:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        textarea { width: 100%; border: none; outline: none; resize: none; font-family: inherit; font-size: 15px; max-height: 200px; padding-right: 40px; }
+        .send-btn { position: absolute; right: 10px; bottom: 10px; width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+        .send-btn:disabled { background: var(--slate-200); }
+
+        /* ── MOBILE RESPONSIVENESS ── */
+        @media (max-width: 768px) {
+            .sidebar { position: absolute; left: 0; top: 0; bottom: 0; transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-handle { display: flex; }
+            .shell.sidebar-collapsed .sidebar { transform: translateX(-100%); }
         }
 
-        /* ── PDF PRINT STYLES ── */
+        /* ── PRINT / PDF STYLES ── */
         @media print {
-            .sidebar, .topbar, .input-zone, .glow-orb, .chips-bar, .menu-btn, .sidebar-overlay { display: none !important; }
-            body, .app, .main, .messages { background: white !important; color: black !important; overflow: visible !important; height: auto !important; }
-            .message { max-width: 100% !important; }
-            .bubble { border: 1px solid #ddd !important; color: black !important; background: #fafafa !important; }
+            .sidebar, .input-area, .header, .sidebar-handle { display: none !important; }
+            .main { height: auto !important; overflow: visible !important; }
+            .messages { padding: 0 !important; }
+            .container { max-width: 100% !important; }
+            .bubble { color: black !important; }
         }
     </style>
 </head>
-<body>
+<body class="">
 
-<div class="glow-orb glow-orb-1"></div>
-<div class="glow-orb glow-orb-2"></div>
-<div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
-
-<div class="app">
+<div class="shell" id="shell">
+    
     <aside class="sidebar" id="sidebar">
+        <div class="sidebar-handle" onclick="toggleSidebar()">
+            <div class="handle-line"></div>
+            <div class="handle-line"></div>
+        </div>
+
         <div class="brand">
-            <div class="brand-flag">🇮🇳</div>
-            <div class="brand-text"><h1>SchemeSahayak</h1></div>
+            <div class="brand-icon">🇮🇳</div>
+            <div style="font-weight: 600; letter-spacing: -0.5px;">SchemeSahayak</div>
         </div>
-        <div class="stat-row">
-            <div class="stat-box"><div class="num">15+</div><div class="lbl">Schemes</div></div>
-            <div class="stat-box"><div class="num">100%</div><div class="lbl">Free</div></div>
+
+        <div class="nav-list">
+            <div class="nav-label">Popular Categories</div>
+            <div class="nav-item" onclick="quickAsk('Farming schemes for small farmers')"><span>🌾</span> Agriculture</div>
+            <div class="nav-item" onclick="quickAsk('Business loan schemes')"><span>💼</span> Business</div>
+            <div class="nav-item" onclick="quickAsk('Scholarships for students')"><span>📚</span> Education</div>
+            <div class="nav-item" onclick="quickAsk('Health insurance schemes')"><span>🏥</span> Health</div>
         </div>
-        <nav class="nav-list">
-            <button class="nav-item" onclick="quickAsk('Farming schemes')"><span class="nav-icon">🌾</span> Farming</button>
-            <button class="nav-item" onclick="quickAsk('Small business loans')"><span class="nav-icon">💼</span> Business</button>
-            <button class="nav-item" onclick="quickAsk('Health insurance')"><span class="nav-icon">🏥</span> Healthcare</button>
-        </nav>
+
+        <div style="padding: 24px; border-top: 1px solid var(--slate-200); font-size: 12px; color: var(--slate-500);">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div style="width:8px; height:8px; background:var(--green); border-radius:50%;"></div>
+                Systems Operational
+            </div>
+        </div>
     </aside>
 
     <main class="main">
-        <header class="topbar">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-                <div class="status-pill"><div class="status-dot"></div>AI Online</div>
-            </div>
-            <div style="display:flex; gap:10px;">
-                <div class="icon-action" onclick="downloadPDF()" title="Download PDF">📥</div>
-                <div class="icon-action" onclick="location.reload()" title="New Chat">🔄</div>
+        <header class="header">
+            <div style="font-weight: 500; font-size: 14px; color: var(--slate-500);">AI Assistant</div>
+            <div class="header-actions">
+                <button class="btn-action" onclick="downloadPDF()">Download PDF</button>
+                <button class="btn-action btn-primary" onclick="window.location.reload()">New Chat</button>
             </div>
         </header>
 
         <div class="messages" id="messages">
-            <div class="welcome" id="welcome">
-                <div style="font-size:50px">👋</div>
-                <h2>How can I help you today?</h2>
-                <div class="welcome-grid">
-                    <div class="welcome-card" onclick="quickAsk('Startup India scheme details')">🚀 Start a business</div>
-                    <div class="welcome-card" onclick="quickAsk('PM Kisan status check')">🌾 Farmer benefits</div>
+            <div class="container" id="chatContainer">
+                <div style="text-align: center; padding: 40px 0;">
+                    <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 12px; letter-spacing: -1px;">How can I help you today?</h1>
+                    <p style="color: var(--slate-500); font-size: 16px;">Search 15+ Central and State Government schemes instantly.</p>
                 </div>
-            </div>
-            <div id="typing" style="display:none; padding:10px; color:var(--mist)">AI is thinking...</div>
+                </div>
+            <div id="typing" style="display:none; font-size: 13px; color: var(--slate-400); margin-left: 52px;">AI is researching...</div>
         </div>
 
-        <div class="input-zone">
-            <div class="input-box">
-                <textarea id="userInput" placeholder="Ask about any government scheme..." rows="1" onkeydown="handleKey(event)"></textarea>
-                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        <div class="input-area">
+            <div class="input-wrapper">
+                <textarea id="userInput" rows="1" placeholder="Type a scheme name or your situation..." onkeydown="handleKey(event)" oninput="autoGrow(this)"></textarea>
+                <button class="send-btn" id="sendBtn" onclick="handleSend()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </div>
+            <p style="text-align: center; font-size: 11px; color: var(--slate-400); margin-top: 12px;">Press Enter to send. Shift + Enter for new line.</p>
         </div>
     </main>
 </div>
 
 <script>
-    // Adjust API URL for production vs local
     const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:8000/chat' : '/chat';
+    const messagesEl = document.getElementById('chatContainer');
+    const inputEl = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingEl = document.getElementById('typing');
 
-    const messagesEl = document.getElementById('messages');
-    const userInput  = document.getElementById('userInput');
-    const typingEl   = document.getElementById('typing');
-    const welcomeEl  = document.getElementById('welcome');
-
-    // FIXED SIDEBAR LOGIC
+    // Sidebar Toggle Logic
     function toggleSidebar() {
-        const sb = document.getElementById('sidebar');
-        const ov = document.getElementById('overlay');
-        sb.classList.toggle('open');
-        ov.style.display = sb.classList.contains('open') ? 'block' : 'none';
+        document.getElementById('sidebar').classList.toggle('open');
     }
 
-    // PDF DOWNLOAD
+    // PDF Download Logic
     function downloadPDF() {
-        if (document.querySelectorAll('.message').length === 0) return alert("Chat is empty!");
         window.print();
+    }
+
+    function autoGrow(el) {
+        el.style.height = 'auto';
+        el.style.height = el.scrollHeight + 'px';
     }
 
     function handleKey(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            sendMessage();
+            handleSend();
         }
     }
 
     function quickAsk(text) {
-        userInput.value = text;
-        if (window.innerWidth < 900) toggleSidebar();
-        sendMessage();
+        inputEl.value = text;
+        autoGrow(inputEl);
+        handleSend();
     }
 
     function addMessage(text, role) {
-        welcomeEl.style.display = 'none';
         const div = document.createElement('div');
-        div.className = `message ${role}`;
-        div.innerHTML = `<div class="bubble">${text.replace(/\n/g, '<br>')}</div>`;
-        messagesEl.insertBefore(div, typingEl);
-        messagesEl.scrollTop = messagesEl.scrollHeight;
+        div.className = `mrow ${role}`;
+        div.style.marginBottom = "32px";
+        
+        const avatar = role === 'user' ? 'U' : 'AI';
+        const formattedText = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+        div.innerHTML = `
+            <div class="avatar">${avatar}</div>
+            <div class="mcontent">
+                <div style="font-size:12px; font-weight:600; color:var(--slate-500); margin-bottom:4px;">${role === 'user' ? 'You' : 'SchemeSahayak'}</div>
+                <div class="bubble">${formattedText}</div>
+            </div>
+        `;
+        messagesEl.appendChild(div);
+        document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
     }
 
-    async function sendMessage() {
-        const msg = userInput.value.trim();
-        if (!msg) return;
+    async function handleSend() {
+        const val = inputEl.value.trim();
+        if (!val) return;
 
-        addMessage(msg, 'user');
-        userInput.value = '';
+        addMessage(val, 'user');
+        inputEl.value = '';
+        inputEl.style.height = 'auto';
+        
+        sendBtn.disabled = true;
         typingEl.style.display = 'block';
 
         try {
             const res = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: msg })
+                body: JSON.stringify({ message: val })
             });
             const data = await res.json();
             typingEl.style.display = 'none';
-            addMessage(data.response || "No data received", 'bot');
+            addMessage(data.response, 'bot');
         } catch (err) {
             typingEl.style.display = 'none';
-            addMessage("⚠️ Server error. Please check your backend connection.", 'bot');
+            addMessage("Error: Could not connect to the API. Ensure your backend is running.", "bot");
+        } finally {
+            sendBtn.disabled = false;
         }
     }
 </script>
-
 </body>
 </html>
