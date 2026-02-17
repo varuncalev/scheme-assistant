@@ -9,12 +9,11 @@
     <style>
         :root {
             --bg-side: #0f172a; 
-            /* Enhanced Tricolor Background */
             --bg-main: linear-gradient(180deg, 
-                rgba(255, 153, 51, 0.12) 0%, 
-                rgba(255, 255, 255, 1) 45%, 
-                rgba(255, 255, 255, 1) 55%, 
-                rgba(19, 136, 8, 0.12) 100%);
+                rgba(255, 153, 51, 0.15) 0%, 
+                rgba(255, 255, 255, 1) 40%, 
+                rgba(255, 255, 255, 1) 60%, 
+                rgba(19, 136, 8, 0.15) 100%);
             --white: #ffffff;
             --primary: #4f46e5; 
             --slate-200: #e2e8f0;
@@ -33,8 +32,6 @@
             display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 100; flex-shrink: 0; position: relative;
         }
-        
-        /* Persistent Handle logic: moves off-screen but handle stays */
         .sidebar.collapsed { margin-left: -280px; }
 
         .sidebar-toggle-handle {
@@ -47,15 +44,15 @@
 
         .brand { padding: 25px 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         
-        /* New Chat Button Styling */
+        /* New Chat Button */
         .btn-new-chat {
             margin: 20px 16px; padding: 12px; border-radius: 12px;
             background: rgba(255, 153, 51, 0.2); color: #ff9933;
             border: 1px solid rgba(255, 153, 51, 0.3);
-            text-align: center; cursor: pointer; font-weight: 600; font-size: 14px;
+            text-align: center; cursor: pointer; font-weight: 700; font-size: 14px;
             transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .btn-new-chat:hover { background: rgba(255, 153, 51, 0.3); transform: scale(0.98); }
+        .btn-new-chat:hover { background: rgba(255, 153, 51, 0.3); }
 
         .sidebar-scroll { flex: 1; overflow-y: auto; padding: 0 16px 20px 16px; }
         .section-tag { font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; margin: 20px 0 10px 10px; }
@@ -77,7 +74,7 @@
         .hero { text-align: center; margin-bottom: 40px; }
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
         .card { 
-            padding: 20px; background: rgba(255,255,255,0.8); border: 1px solid var(--slate-200); 
+            padding: 20px; background: rgba(255,255,255,0.85); border: 1px solid var(--slate-200); 
             border-radius: 12px; cursor: pointer; transition: 0.2s; text-align: left;
         }
         .card:hover { border-color: var(--primary); background: white; transform: translateY(-2px); }
@@ -88,10 +85,16 @@
         .msg-meta { font-size: 11px; font-weight: 800; color: var(--slate-500); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
         
         .bubble { 
-            background: white; padding: 16px 20px; border-radius: 14px; border: 1px solid var(--slate-200);
-            font-size: 14.5px; line-height: 1.6; max-width: 85%;
+            background: white; padding: 18px 22px; border-radius: 14px; border: 1px solid var(--slate-200);
+            font-size: 14.5px; line-height: 1.7; max-width: 90%; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
         .user .bubble { background: #1e293b; color: white; border: none; }
+        
+        /* AI Response Formatting */
+        .bubble b, .bubble strong { color: #0f172a; font-weight: 700; }
+        .user .bubble b, .user .bubble strong { color: white; }
+        .bubble ul { padding-left: 20px; margin: 10px 0; }
+        .bubble li { margin-bottom: 6px; }
         .bubble a { color: var(--primary); font-weight: 600; text-decoration: underline; }
 
         /* ── INPUT ── */
@@ -99,6 +102,7 @@
         .input-box { 
             max-width: 800px; margin: 0 auto; display: flex; align-items: center; 
             background: white; border: 1px solid var(--slate-200); padding: 10px 18px; border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
         }
         textarea { flex: 1; border: none; outline: none; resize: none; font-size: 15px; background: transparent; }
         .btn-send { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; }
@@ -112,7 +116,7 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-toggle-handle" onclick="toggleSidebar()">
             <div class="handle-line"></div>
-            <div class="handle-line"></div>
+            <div class="handle-line (cite: image_f88aa9.jpg)"></div>
         </div>
 
         <div class="brand">
@@ -147,16 +151,16 @@
             <div class="center-wrap">
                 <div class="hero" id="welcome">
                     <h1 style="font-size: 38px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px;">Namaste</h1>
-                    <p style="color: var(--slate-500);">Select a question or type below to find government benefits.</p>
+                    <p style="color: var(--slate-500);">I am your AI assistant for finding government benefits.</p>
                     
                     <div class="card-grid">
-                        <div class="card" onclick="quickAsk('What are the benefits for small farmers?')">
-                            <b>🚜 Farming Help</b>
-                            <span style="font-size: 13px; color: #64748b;">PM-Kisan & Credit Cards</span>
+                        <div class="card" onclick="quickAsk('I want to start a small business')">
+                            <b>💼 Start a Business</b>
+                            <span style="font-size: 13px; color: #64748b;">MUDRA loans and registration help.</span>
                         </div>
-                        <div class="card" onclick="quickAsk('How can I get a loan for a small business?')">
-                            <b>💼 Business Loans</b>
-                            <span style="font-size: 13px; color: #64748b;">MUDRA & MSME Support</span>
+                        <div class="card" onclick="quickAsk('Schemes for small farmers')">
+                            <b>🚜 Farming Support</b>
+                            <span style="font-size: 13px; color: #64748b;">Income support and credit cards.</span>
                         </div>
                     </div>
                 </div>
@@ -194,6 +198,15 @@
         historyList.prepend(item);
     }
 
+    // Improved Parser for Clean Formatting
+    function formatResponse(text) {
+        let fmt = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        fmt = fmt.replace(/^\* (.*$)/gim, '<li>$1</li>'); // Lists
+        fmt = fmt.replace(/(<li>.*<\/li>)/gms, '<ul>$1</ul>'); // Wrap lists
+        fmt = fmt.replace(/\n/g, '<br>'); // Breaks
+        return fmt.replace(/(https?:\/\/[^\s]+)/g, url => `<a href="${url}" target="_blank">${url}</a>`);
+    }
+
     function addMessage(text, role) {
         welcome.style.display = 'none';
         const row = document.createElement('div');
@@ -203,7 +216,7 @@
         row.innerHTML = `
             <div style="width: 100%;">
                 <div class="msg-meta" style="${role === 'user' ? 'justify-content: flex-end;' : ''}">${label}</div>
-                <div class="bubble" style="${role === 'user' ? 'margin-left: auto;' : ''}">${text}</div>
+                <div class="bubble" style="${role === 'user' ? 'margin-left: auto;' : ''}">${role === 'bot' ? formatResponse(text) : text}</div>
             </div>`;
         chatThread.appendChild(row);
         document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight;
@@ -228,7 +241,7 @@
             addMessage(data.response, 'bot');
         } catch (e) {
             document.getElementById('typing').style.display = 'none';
-            addMessage("Service is currently processing other requests. Please try again in 30 seconds.", 'bot');
+            addMessage("I'm sorry, I'm having trouble connecting right now. Please try again soon.", 'bot');
         }
     }
 </script>
